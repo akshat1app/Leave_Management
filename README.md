@@ -1,98 +1,100 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+# 🏖️ Leave Management API
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+Leave Management API is a backend system for managing user leave requests, user onboarding, and profile management. Built with **Node.js**, **MongoDB**, and **JWT Authentication**, it supports user registration, login, leave applications, and profile updates.
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+---
 
-## Description
+## 🚀 Tech Stack
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+- **Backend Framework**: [Node.js](https://nodejs.org) + **NestJs**
+- **Database**: MongoDB (via Mongoose)
+- **Authentication**: JWT-based Authentication
+- **Password Hashing**: bcrypt
+- **Email**: Nodemailer for OTP email verification
+- **Session Management**: Redis for OTP verification
+- **Logging**: Winston for logging requests and errors
+- **Validation**: DTOs and class-validator
+- **Error Handling**: Custom error handling for leave management and user onboarding
 
-## Project setup
+---
 
+## 📦 Installation
+
+### Clone the repository
 ```bash
-$ npm install
-```
+git clone https://github.com/akshat1app/LeaveManagement.git
+cd LeaveManagement
 
-## Compile and run the project
+Install dependencies
+npm install
 
-```bash
-# development
-$ npm run start
+Run the app
+npm run start:dev
 
-# watch mode
-$ npm run start:dev
+🔐 Authentication
+All protected routes require an Authorization: Bearer <token> header.
 
-# production mode
-$ npm run start:prod
-```
+📂 API Endpoints
+📁 Auth Module
+Method | Endpoint | Description | Protected
+POST | /users/api/v1/signup | Create a new user account | ❌
+POST | /users/api/v1/login | Authenticate user and return token | ❌
+POST | /users/api/v1/forget-password | Trigger password reset process | ❌
+POST | /users/api/v1/send-otp | Resend OTP for verification | ❌
+POST | /users/api/v1/verify-otp | Verify OTP sent to user | ❌
+POST | /users/api/v1/reset-password | Reset user password | ❌
 
-## Run tests
+Note:
+OTP should expire in 5 minutes from the time of generation.
 
-```bash
-# unit tests
-$ npm run test
+📁 User Module
+Method | Endpoint | Description | Protected
+GET | /users/api/v1/profile | Retrieve user profile details | ✅
+PATCH | /users/api/v1/profile | Update user profile (name, profile picture) | ✅
 
-# e2e tests
-$ npm run test:e2e
+📁 Leave Management Module
+Method | Endpoint | Description | Protected
+POST | /users/api/v1/leave | Apply for a leave | ✅
+GET | /users/api/v1/leave | Get all leave applications (filter by leave type, paginated) | ✅
+GET | /users/api/v1/leave/:leaveId | Retrieve details of a specific leave request | ✅
 
-# test coverage
-$ npm run test:cov
-```
+Leave Management Business Rules:
+A user can apply for only one leave on the same day
+Users cannot apply for leave that is backdated by more than 3 days.
+Each user is initialized with 6 leave days upon account creation.
 
-## Deployment
+📊 Business Rules
+Leave Types:
+The system includes two types of leave:
+Planned Leave
+Emergency Leave
 
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
+Leave Initialization:
+Upon user registration, each new user is initialized with 6 total leave days.
 
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
+Leave Limits:
+A user cannot apply for more than one leave on the same day.
+Users cannot apply for leave that is backdated by more than 3 days.
 
-```bash
-$ npm install -g mau
-$ mau deploy
-```
+Leave Balance:
+Users can only apply for leaves if they have enough remaining leave days.
 
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
+Leave Overlap:
+The system ensures that users cannot apply for leave on the same day more than once.
 
-## Resources
+Leave Application Validation:
+If a leave application overlaps with an existing leave or violates any rule (such as backdating), the system will reject the request.
 
-Check out a few resources that may come in handy when working with NestJS:
+📁 Project Structure
+src/
+│
+├── auth/           # Auth module (login, register, OTP, token, reset-password)
+├── user/           # User profile management
+├── leave/          # Leave management (apply, view, history)
+├── common/         # Common utilities (error handling, logging)
+├── config/         # Centralized app configurations
+├── main.ts         # Entry point
 
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
-
-## Support
-
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
-
-## Stay in touch
-
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
-
-## License
-
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+🧑‍💻 Author
+Akshat Srivastava
+GitHub | LinkedIn
